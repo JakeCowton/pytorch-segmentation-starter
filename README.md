@@ -1,6 +1,8 @@
-# Blood Cell Segmentation
+# A generic Instance and Semantic Segmentation Starter Repo
 
 Semantic and instance segmentation implementations that operate on VOC, COCO, & Data Science Bowl 2018 (implemented as a custom dataset). If you wish to modify this for your own dataset, use the corresponding `dsb_dataset.py` as a template.
+
+This was developed in order to carry out instance and semantic segmentation for finding nucliei in micorscope images of blood cells in order to do blood cancer detection.
 
 ## Supported datasets
 
