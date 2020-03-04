@@ -74,7 +74,7 @@ class DSB(Dataset):
             "masks": torch.tensor(masks),
             "image_id": torch.tensor([index]),
             "area": torch.tensor(area),
-            "is_crowd": torch.tensor(is_crowd)
+            "iscrowd": torch.tensor(is_crowd)
         }
 
         img, target = self.transforms(img, target)

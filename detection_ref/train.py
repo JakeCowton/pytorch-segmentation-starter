@@ -132,7 +132,9 @@ def main(args):
         params, lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
 
     # lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.lr_step_size, gamma=args.lr_gamma)
-    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_steps, gamma=args.lr_gamma)
+    # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.lr_steps, gamma=args.lr_gamma)
+    lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer,
+                            T_0=args.epochs * (len(data_loader.dataset) // args.batch_size))
 
     if args.resume:
         checkpoint = torch.load(args.resume, map_location='cpu')
