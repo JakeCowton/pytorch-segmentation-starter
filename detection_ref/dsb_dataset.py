@@ -71,7 +71,7 @@ class DSB(Dataset):
         target = {
             "boxes": torch.tensor(boxes),
             "labels": torch.tensor(labels),
-            "masks": torch.tensor(masks),
+            "masks": torch.tensor(masks, dtype=torch.uint8),
             "image_id": torch.tensor([index]),
             "area": torch.tensor(area),
             "iscrowd": torch.tensor(is_crowd)
