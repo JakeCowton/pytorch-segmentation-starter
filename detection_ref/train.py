@@ -119,7 +119,7 @@ def main(args):
         collate_fn=utils.collate_fn)
 
     data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, batch_size=1,
+        dataset_test, batch_size=args.batch_size,
         sampler=test_sampler, num_workers=args.workers,
         collate_fn=utils.collate_fn)
 
