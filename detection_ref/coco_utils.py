@@ -2,6 +2,8 @@ import copy
 import os
 from PIL import Image
 
+from tqdm import tqdm
+
 import torch
 import torch.utils.data
 import torchvision
@@ -144,12 +146,13 @@ def _coco_remove_images_without_annotations(dataset, cat_list=None):
 
 
 def convert_to_coco_api(ds):
+    print("Converting to COCO")
     coco_ds = COCO()
     # annotation IDs need to start at 1, not 0, see torchvision issue #1530
     ann_id = 1
     dataset = {'images': [], 'categories': [], 'annotations': []}
     categories = set()
-    for img_idx in range(len(ds)):
+    for img_idx in tqdm(range(len(ds))):
         # find better way to get target
         # targets = ds.get_annotations(img_idx)
         img, targets = ds[img_idx]

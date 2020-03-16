@@ -3,6 +3,8 @@ import sys
 import time
 import torch
 
+import pickle
+
 import torchvision.models.detection.mask_rcnn
 
 from coco_utils import get_coco_api_from_dataset
@@ -65,7 +67,10 @@ def _get_iou_types(model):
 
 
 @torch.no_grad()
-def evaluate(model, data_loader, device):
+def evaluate(model, data_loader, device, coco_evaluator=None, coco_api=None):
+    if coco_evaluator and coco_api:
+        raise ValueError("Either coco_evaluator or coco_api or neither "\
+                         "should be set. No other combination should be used")
     n_threads = torch.get_num_threads()
     # FIXME remove this and make paste_masks_in_image run on the GPU
     torch.set_num_threads(1)
@@ -74,9 +79,17 @@ def evaluate(model, data_loader, device):
     metric_logger = utils.MetricLogger(delimiter="  ")
     header = 'Test:'
 
-    coco = get_coco_api_from_dataset(data_loader.dataset)
-    iou_types = _get_iou_types(model)
-    coco_evaluator = CocoEvaluator(coco, iou_types)
+    if not coco_evaluator and not coco_api:
+        # Build the COCO API and pickle it for future use
+        coco_api = get_coco_api_from_dataset(data_loader.dataset)
+        with open(f"./{type(data_loader.dataset).__name__}_coco.pkl", "wb") as f:
+            pickle.dump(coco_api, f)
+
+    if not coco_evaluator and coco_api:
+        # Only build the COCO evaluator if coco_api is passed
+        # as this means it did not exist
+        iou_types = _get_iou_types(model)
+        coco_evaluator = CocoEvaluator(coco_api, iou_types)
 
     for image, targets in metric_logger.log_every(data_loader, 100, header):
         image = list(img.to(device) for img in image)

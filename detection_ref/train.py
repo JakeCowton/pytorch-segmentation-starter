@@ -20,6 +20,7 @@ the number of epochs should be adapted so that we have the same number of iterat
 import datetime
 import os
 import time
+import pickle
 
 import torch
 import torch.utils.data
@@ -73,6 +74,11 @@ def get_transform(train):
     if train:
         transforms.append(T.RandomHorizontalFlip(0.5))
     return T.Compose(transforms)
+
+
+def load_coco_api(coco_api_path):
+    with open(coco_api_path, "rb") as f:
+        return pickle.load(f)
 
 
 def main(args):
@@ -149,6 +155,9 @@ def main(args):
 
     print("Start training")
     start_time = time.time()
+
+    coco_api = load_coco_api(args.cocoapi) if args.cocoapi else None
+
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
@@ -163,8 +172,8 @@ def main(args):
                 'epoch': epoch},
                 os.path.join(args.output_dir, 'model_{}.pth'.format(epoch)))
 
-        # evaluate after every epoch
-        evaluate(model, data_loader_test, device=device)
+        # Evaluate after each epoch
+        evaluate(model, data_loader_test, device=device, coco_api=coco_api)
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
@@ -179,6 +188,7 @@ if __name__ == "__main__":
     parser.add_argument('--data-path', default='/datasets01/COCO/022719/', help='dataset')
     parser.add_argument('--dataset', default='coco', help='dataset')
     parser.add_argument('--imageset', default='stage1_train', help='imageset')
+    parser.add_argument('--cocoapi', help='Path to pickled COCO API for test set')
     parser.add_argument('--model', default='maskrcnn_resnet50_fpn', help='model')
     parser.add_argument('--device', default='cuda', help='device')
     parser.add_argument('-b', '--batch-size', default=2, type=int,
