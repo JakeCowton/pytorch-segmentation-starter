@@ -19,4 +19,4 @@ Nucleus detection in blood cells
 
 ## Demo Scripts
 
-TODO
+See the respective README files in `detection_ref` and `segmentation_ref`.
