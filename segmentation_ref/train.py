@@ -14,8 +14,6 @@ import utils
 
 from dsb_dataset import DSB
 
-DSB_ROOT = "/home/jake/data/data-science-bowl-2018"
-
 
 def load_dsb(root_path, image_set, transforms, val_percent=0.15):
 
@@ -127,7 +125,7 @@ def main(args):
                                       get_transform(train=False))
     else:
         dataset, dataset_test, num_classes = load_dsb(
-                                    DSB_ROOT,
+                                    args.data_path,
                                     args.imageset,
                                     get_transform(train=True))
 
@@ -212,6 +210,7 @@ def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description='PyTorch Segmentation Training')
 
+    parser.add_argument('--data-path', help='Path to dataset files')
     parser.add_argument('--dataset', default='voc', help='dataset')
     parser.add_argument('--imageset', default='voc', help='imageset')
     parser.add_argument('--model', default='fcn_resnet101', help='model')
