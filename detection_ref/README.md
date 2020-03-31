@@ -1,10 +1,14 @@
 # Object detection reference training scripts
 
-This folder contains reference training scripts for object detection.
-They serve as a log of how to train specific models, as provide baseline
-training and evaluation scripts to quickly bootstrap research.
+## Data Science Bowl
 
-Except otherwise noted, all models have been trained on 8x V100 GPUs.
+This will train MaskRCNN on DSB18 and store them in the runs folder. Other arguments for this can be found at the end of `train.py`.
+
+```
+python train.py --dataset dsb --imageset stage1_train --data-path /path/to/data-science-bowl-2018 --model maskrcnn_resnet50_fpn --output-dir ./runs/maskrcnn -j 50
+```
+
+## Benchmark datasets
 
 ### Faster R-CNN
 ```

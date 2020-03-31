@@ -21,6 +21,8 @@ import datetime
 import os
 import time
 import pickle
+import logging
+import sys
 
 import torch
 import torch.utils.data
@@ -38,11 +40,10 @@ from engine import train_one_epoch, evaluate
 from torch.utils.data import random_split
 
 import utils
+from utils import LogFile
 import transforms as T
 
 from dsb_dataset import DSB
-
-DSB_ROOT = "/home/jake/data/data-science-bowl-2018"
 
 
 def load_dsb(root_path, image_set, transforms, val_percent=0.15):
@@ -95,7 +96,7 @@ def main(args):
         dataset_test, _ = get_dataset(args.dataset, "val", get_transform(train=False), args.data_path)
     else:
         dataset, dataset_test, num_classes = load_dsb(
-                                    DSB_ROOT,
+                                    args.data_path,
                                     args.imageset,
                                     get_transform(train=True))
 
@@ -149,14 +150,14 @@ def main(args):
         lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
         args.start_epoch = checkpoint['epoch'] + 1
 
+    coco_api = load_coco_api(args.cocoapi) if args.cocoapi else None
+
     if args.test_only:
-        evaluate(model, data_loader_test, device=device)
+        evaluate(model, data_loader_test, device=device, coco_api=coco_api)
         return
 
     print("Start training")
     start_time = time.time()
-
-    coco_api = load_coco_api(args.cocoapi) if args.cocoapi else None
 
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
@@ -233,4 +234,10 @@ if __name__ == "__main__":
     if args.output_dir:
         utils.mkdir(args.output_dir)
 
+    logging.basicConfig(filename=os.path.join(args.output_dir, "log.log"),
+                        level=logging.INFO,
+                        format="%(asctime)s %(levelname)s: %(message)s",
+                        datefmt="%Y-%m-%d %H:%M:%S")
+    sys.stdout = LogFile('stdout')
+    sys.stderr = LogFile('stderr')
     main(args)
